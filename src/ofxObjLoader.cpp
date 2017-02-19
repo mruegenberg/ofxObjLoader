@@ -27,7 +27,7 @@
 
 OFX_OBJLOADER_BEGIN_NAMESPACE
 
-void load(string path, ofMesh& mesh, bool generateNormals, bool flipFace)
+bool load(string path, ofMesh& mesh, bool generateNormals, bool flipFace)
 {
 	path = ofToDataPath(path);
 
@@ -36,6 +36,8 @@ void load(string path, ofMesh& mesh, bool generateNormals, bool flipFace)
 	GLMmodel* m;
 
 	m = glmReadOBJ((char*)path.c_str());
+        if(! m)
+            return false;
 
 	if (generateNormals)
 	{
@@ -78,9 +80,10 @@ void load(string path, ofMesh& mesh, bool generateNormals, bool flipFace)
 	}
 
 	glmDelete(m);
+        return true;
 }
 
-void loadGroup(string path, map<string, ofMesh>& groups, bool generateNormals)
+bool loadGroup(string path, map<string, ofMesh>& groups, bool generateNormals)
 {
 	path = ofToDataPath(path);
 
@@ -140,6 +143,7 @@ void loadGroup(string path, map<string, ofMesh>& groups, bool generateNormals)
 	}
 
 	glmDelete(m);
+        return true;
 }
 
 void save(string path, const ofMesh& mesh_, bool flipFace, bool flipNormals, bool export_vertexcolor_to_texture)
