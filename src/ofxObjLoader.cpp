@@ -50,7 +50,7 @@ bool load(string path, ofMesh& mesh, bool generateNormals, bool flipFace)
 		glmReverseWinding(m);
 	}
 
-	for (int j = 0; j < m->numtriangles; j++)
+	for (size_t j = 0; j < m->numtriangles; j++)
 	{
 		const GLMtriangle &tri = m->triangles[j];
 
@@ -92,6 +92,7 @@ bool loadGroup(string path, map<string, ofMesh>& groups, bool generateNormals)
 	GLMmodel* m;
 
 	m = glmReadOBJ((char*)path.c_str());
+        if(! m) return false;
 
 	if (generateNormals)
 	{
@@ -109,7 +110,7 @@ bool loadGroup(string path, map<string, ofMesh>& groups, bool generateNormals)
 		ofMesh t;
 		GLMtriangle *p = m->triangles;
 
-		for (int j = 0; j < g->numtriangles; j++)
+		for (size_t j = 0; j < g->numtriangles; j++)
 		{
 			GLMtriangle tri = p[g->triangles[j]];
 
@@ -175,7 +176,7 @@ void save(string path, const ofMesh& mesh_, bool flipFace, bool flipNormals, boo
 			string material_name = file.getBaseName();
 			
 			string image_name = material_name + ".png";
-			ofPixels pix = image.getPixelsRef();
+			ofPixels pix = image.getPixels();
 			
 			// flip save texture
 			pix.mirror(true, false);
@@ -228,7 +229,7 @@ void save(string path, const ofMesh& mesh_, bool flipFace, bool flipNormals, boo
 		vector<ofVec3f> normals = mesh.getNormals();
 		
 		if (flipNormals)
-			for (int i = 0; i < normals.size(); i++)
+			for (size_t i = 0; i < normals.size(); i++)
 				normals[i] *= -1;
 		
 		memcpy(&m->normals[3], &normals[0].x, sizeof(ofVec3f) * normals.size());
@@ -250,7 +251,7 @@ void save(string path, const ofMesh& mesh_, bool flipFace, bool flipNormals, boo
 
 		m->groups = new GLMgroup();
 		m->groups->next = NULL;
-		m->groups->material = NULL;
+		m->groups->material = 0;
 		
 		string name = "ofMesh";
 		m->groups->name = (char*)malloc(sizeof(char) * name.length() + 1);
@@ -260,7 +261,7 @@ void save(string path, const ofMesh& mesh_, bool flipFace, bool flipNormals, boo
 		m->groups->triangles = new GLuint[m->groups->numtriangles];
 		m->numgroups = 1;
 
-		for (int i = 0; i < mesh.getNumIndices(); i += 3)
+		for (size_t i = 0; i < mesh.getNumIndices(); i += 3)
 		{
 			int idx = i / 3;
 			for (int j = 0; j < 3; j++)
@@ -279,7 +280,7 @@ void save(string path, const ofMesh& mesh_, bool flipFace, bool flipNormals, boo
 
 		m->groups = new GLMgroup();
 		m->groups->next = NULL;
-		m->groups->material = NULL;
+		m->groups->material = 0;
 		
 		string name = "ofMesh";
 		m->groups->name = (char*)malloc(sizeof(char) * name.length() + 1);
@@ -289,7 +290,7 @@ void save(string path, const ofMesh& mesh_, bool flipFace, bool flipNormals, boo
 		m->groups->triangles = new GLuint[m->groups->numtriangles];
 		m->numgroups = 1;
 
-		for (int i = 0; i < mesh.getNumVertices(); i += 3)
+		for (size_t i = 0; i < mesh.getNumVertices(); i += 3)
 		{
 			int idx = i / 3;
 			for (int j = 0; j < 3; j++)
@@ -324,7 +325,7 @@ void saveGroup(string path, const vector<ofMesh> & meshGroup, bool flipFace, boo
     int numOfIndicesTotal = 0;
     int numOfTrianglesTotal = 0;
     
-    for(int i=0; i<meshGroup.size(); i++) {
+    for(size_t i=0; i<meshGroup.size(); i++) {
         const ofMesh & mesh = meshGroup[i];
         
         numOfVerticesTotal += mesh.getNumVertices();
@@ -379,7 +380,7 @@ void saveGroup(string path, const vector<ofMesh> & meshGroup, bool flipFace, boo
     int indexIndices = 0;
     int indexTriangles = 0;
     
-    for(int k=0; k<meshGroup.size(); k++) {
+    for(size_t k=0; k<meshGroup.size(); k++) {
         const ofMesh & mesh = meshGroup[k];
         
         if(numOfVerticesTotal > 0) {
@@ -396,7 +397,7 @@ void saveGroup(string path, const vector<ofMesh> & meshGroup, bool flipFace, boo
             vector<ofVec3f> normals = mesh.getNormals();
             
             if(flipNormals) {
-                for(int i = 0; i < normals.size(); i++) {
+                for(size_t i = 0; i < normals.size(); i++) {
                     normals[i] *= -1;
                 }
             }
@@ -425,7 +426,7 @@ void saveGroup(string path, const vector<ofMesh> & meshGroup, bool flipFace, boo
         GLMgroup * groupPrev = group;
         group = new GLMgroup();
         group->next = NULL;
-        group->material = NULL;
+        group->material = 0;
         
         if(m->groups == NULL) {
             m->groups = group;
@@ -487,7 +488,7 @@ void vertexColorToFaceColor(ofMesh& mesh)
 	vector<ofFloatColor> face_color;
 	vector<ofFloatColor> &color = mesh.getColors();
 	
-	for (int i = 0; i < color.size(); i += 3)
+	for (size_t i = 0; i < color.size(); i += 3)
 	{
 		ofFloatColor c0 = color[i + 0];
 		ofFloatColor c1 = color[i + 1];
@@ -520,7 +521,7 @@ void faceColorToTexture(ofMesh& mesh, ofImage& image)
 	
 	mesh.clearTexCoords();
 	
-	image.getPixelsRef().set(0);
+	image.getPixels().set(0);
 	
 	float texel_size = (1. / image.getWidth()) * 0.5;
 	
